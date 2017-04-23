@@ -46,11 +46,10 @@ namespace UnindentFix {
 			using (var undoContext = new UndoContextHelper(_dte2, "Unindent Selection")) {
 				TextSelection selection = (TextSelection)document.Selection;
 				bool isReverse = !selection.IsActiveEndGreater;
-				if (isReverse) selection.SwapAnchor();
-				int startLine = selection.AnchorPoint.Line;
-				int startLineCharOffset = selection.AnchorPoint.LineCharOffset;
-				int endLine = selection.ActivePoint.Line;
-				int endLineCharOffset = selection.ActivePoint.LineCharOffset;
+				int startLine = selection.TopPoint.Line;
+				int startLineCharOffset = selection.TopPoint.LineCharOffset;
+				int endLine = selection.BottomPoint.Line;
+				int endLineCharOffset = selection.BottomPoint.LineCharOffset;
 				for (int iLine = startLine; iLine <= endLine; iLine++) {
 					if (iLine == endLine && endLineCharOffset == 1) break;
 					selection.GotoLine(iLine, true);
