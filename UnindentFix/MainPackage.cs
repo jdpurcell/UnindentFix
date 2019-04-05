@@ -5,27 +5,33 @@
 // --------------------------------------------------------------------------------
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace UnindentFix {
-	[PackageRegistration(UseManagedResourcesOnly = true)]
+	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 	[InstalledProductRegistration("Unindent Fix", "Fixes unindent behavior.", VersionInfo.Version)]
 	[Guid("d10f95f0-7264-47f2-9cf9-2092406dc906")]
-	[ProvideAutoLoad(VSConstants.VsEditorFactoryGuid.TextEditor_string)]
-	public sealed class MainPackage : Package {
+	[ProvideAutoLoad(VSConstants.VsEditorFactoryGuid.TextEditor_string, PackageAutoLoadFlags.BackgroundLoad)]
+	public sealed class MainPackage : AsyncPackage {
 		private DTE2 _dte2;
 		private CommandEvents _std2KCommandEvents; // This reference must be held
 
-		protected override void Initialize() {
-			_dte2 = (DTE2)GetService(typeof(DTE));
+		protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
+			// Switch to UI thread
+			await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+			// Query service from UI thread
+			_dte2 = (DTE2)await GetServiceAsync(typeof(DTE));
 
 			_std2KCommandEvents = _dte2.Events.CommandEvents[VSConstants.CMDSETID.StandardCommandSet2K_string];
 			_std2KCommandEvents.BeforeExecute += Std2KCommandEvents_BeforeExecute;
 
-			base.Initialize();
+			await base.InitializeAsync(cancellationToken, progress);
 		}
 
 		private void Std2KCommandEvents_BeforeExecute(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault) {
