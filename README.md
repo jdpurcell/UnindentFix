@@ -1,5 +1,5 @@
 ﻿# Unindent Fix
-An extension for Visual Studio 2015 and 2017 to fix its unindent behavior (when pressing Shift+Tab or using the Decrease Line Indent command). By default, Visual Studio aligns everything to tab stops which destroys partial indentation.
+An extension for Visual Studio 2015, 2017, and 2019 to fix its unindent behavior (when pressing Shift+Tab or using the Decrease Line Indent command). By default, Visual Studio aligns everything to tab stops which destroys partial indentation.
 
 Example code:
 ```
